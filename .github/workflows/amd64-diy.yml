@@ -34,31 +34,75 @@ jobs:
         tar -czf x86-64-images.tar.gz *-amd64.tar
         split -b 50M --additional-suffix=.tar.gz x86-64-images.tar.gz x86-64-images-part-
 
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: docker-images-tar
-    #     path: x86-64-images-part-*
-    #     retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-aa
+        path: x86-64-images-part-aa*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
 
-    # - name: Get list of parts
-    #   id: get-parts
-    #   run: |
-    #     echo "::set-output name=parts::$(ls x86-64-images-part-*.tar.gz)"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ab
+        path: x86-64-images-part-ab*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
 
-    - name: Upload artifacts
-      id: upload-artifacts
-      run: |
-        # 获取所有分片的列表
-        PARTS=$(ls x86-64-images-part-*.tar.gz)
-        
-        # 使用循环来上传每个分片
-        for PART in $PARTS; do
-          echo "Uploading artifact: $PART"
-          gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${GITHUB_REPOSITORY}/actions/artifacts -X POST -F name=docker-images-tar-$PART -F path=$PART -F expiration=PT24H
-        done
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ac
+        path: x86-64-images-part-ac*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ad
+        path: x86-64-images-part-ad*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ae
+        path: x86-64-images-part-ae*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-af
+        path: x86-64-images-part-af*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ag
+        path: x86-64-images-part-ag*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ah
+        path: x86-64-images-part-ah*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-ai
+        path: x86-64-images-part-ai*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar-aj
+        path: x86-64-images-part-aj*
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
 
     - name: Clean up intermediate files
       run: |
