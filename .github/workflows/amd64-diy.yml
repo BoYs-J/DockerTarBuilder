@@ -45,7 +45,7 @@ jobs:
     #   id: get-parts
     #   run: |
     #     echo "::set-output name=parts::$(ls x86-64-images-part-*.tar.gz)"
-      
+
     - name: Upload artifacts
       id: upload-artifacts
       run: |
@@ -55,16 +55,12 @@ jobs:
         # 使用循环来上传每个分片
         for PART in $PARTS; do
           echo "Uploading artifact: $PART"
-          curl --request POST \
-            --url https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
-            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'Accept: application/vnd.github+json' \
-            --header 'Content-Type: application/json' \
-            --data '{ "name": "docker-images-tar-${PART}", "path": "${PART}", "expiration": "PT24H" }'
+          gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${GITHUB_REPOSITORY}/actions/artifacts -X POST -F name=docker-images-tar-$PART -F path=$PART -F expiration=PT24H
         done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Clean up intermediate files
       run: |
         rm *-amd64.tar
         rm x86-64-images.tar.gz
-
