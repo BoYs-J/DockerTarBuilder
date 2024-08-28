@@ -1,0 +1,62 @@
+name: x86-64 Pull and Save Docker Image
+on:
+  workflow_dispatch:
+    inputs:
+      docker_images:
+        description: '请填写docker镜像名称 多个用英文逗号分开'
+        required: true
+        default: 'alpine:latest'  # 设置默认的 Docker 镜像列表
+
+jobs:
+  pull_and_package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Clean up Docker to free space
+      run: |
+          docker system prune -a -f
+          docker volume prune -f
+
+    - name: Pull Docker Images and Package
+      run: |
+        images="${{ github.event.inputs.docker_images }}"
+        IFS=',' read -r -a image_array <<< "$images"
+        for image in "${image_array[@]}"; do
+          docker pull "${image}" --platform "linux/amd64"
+          docker save "${image}" -o "${image//\//_}-amd64.tar"
+        done
+
+    - name: Compress the TAR files
+      run: tar -czf x86-64-images.tar.gz *-amd64.tar
+
+    - name: Create new branch or update existing branch
+      id: create_or_update_branch
+      run: |
+        git config --global user.email "info@cdzero.cn"
+        git config --global user.name "J"
+        git checkout -b artifacts  # 创建或切换到 artifacts 分支
+        git add x86-64-images.tar.gz  # 将文件添加到暂存区
+        git commit -m "Add x86-64 docker images tarball" -a || true  # 提交更改
+        echo "::set-output name=branch_name::artifacts"  # 输出分支名供后续步骤使用
+
+    - name: Push changes to remote repository
+      uses: ad-m/github-push-action@master
+      with:
+        branch: ${{ steps.create_or_update_branch.outputs.branch_name }}  # 使用之前创建的分支名
+        directory: .  # 推送整个目录
+        repository: ${{ github.repository }}  # 当前仓库
+        github_token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub 自动提供的 GITHUB_TOKEN
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images-tar
+        path: x86-64-images.tar.gz
+        retention-days: 1  # 将保留天数设置为 1 天 最多可设置90天
+
+    - name: Clean up intermediate files
+      run: |
+        rm *-amd64.tar
