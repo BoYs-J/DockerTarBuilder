@@ -6,6 +6,10 @@ on:
         description: '请填写docker镜像名称 多个用英文逗号分开'
         required: true
         default: 'alpine:latest'  # 设置默认的 Docker 镜像列表
+      split_images_size:
+        description: '每个文件的大小（MB）'
+        required: true
+        default: '100'  # 设置默认的 Docker 镜像列表
 
 jobs:
   pull_and_package:
@@ -32,7 +36,7 @@ jobs:
     - name: Compress the TAR files
       run: |
         tar -czf x86-64-images.tar.gz *-amd64.tar
-        split -b 50M --additional-suffix=.tar.gz x86-64-images.tar.gz x86-64-images-part-
+        split -b "${{ github.event.inputs.split_images_size }}" --additional-suffix=.tar.gz x86-64-images.tar.gz x86-64-images-part-
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
